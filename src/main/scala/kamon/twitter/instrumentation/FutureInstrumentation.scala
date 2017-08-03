@@ -23,11 +23,11 @@ import org.aspectj.lang.annotation._
 @Aspect
 class FutureInstrumentation {
 
-  @DeclareMixin("com.twitter.util..* && java.lang.Runnable+")
+  @DeclareMixin("java.lang.Runnable+")
   def mixinTraceContextAwareToFutureRelatedRunnable: TraceContextAware =
     TraceContextAware.default
 
-  @Pointcut("execution((com.twitter.util..* && java.lang.Runnable+).new(..)) && this(runnable)")
+  @Pointcut("execution((java.lang.Runnable+).new(..)) && this(runnable)")
   def futureRelatedRunnableCreation(runnable: TraceContextAware): Unit = {}
 
   @After("futureRelatedRunnableCreation(runnable)")
@@ -36,8 +36,8 @@ class FutureInstrumentation {
     runnable.traceContext
   }
 
-  @Pointcut("execution(* (com.twitter.util..* && java.lang.Runnable+).run()) && this(runnable)")
-  def futureRelatedRunnableExecution(runnable: TraceContextAware) = {}
+  @Pointcut("execution(* (java.lang.Runnable+).run()) && this(runnable)")
+  def futureRelatedRunnableExecution(runnable: TraceContextAware): Unit = {}
 
   @Around("futureRelatedRunnableExecution(runnable)")
   def aroundExecution(pjp: ProceedingJoinPoint, runnable: TraceContextAware): Any = {
